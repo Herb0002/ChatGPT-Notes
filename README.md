@@ -1,6 +1,5 @@
 # ChatGPT Work Notes Extension  
 
-[![Download ChatGPT-Notes.zip](https://img.shields.io/badge/⬇️%20Download%20ChatGPT--Notes.zip-4C1?style=for-the-badge)](https://github.com/Herb0002/ChatGPT-Notes/releases/latest/download/ChatGPT-Notes.zip)  
 [![Stars](https://img.shields.io/github/stars/Herb0002/ChatGPT-Notes?style=for-the-badge&color=yellow)](https://github.com/Herb0002/ChatGPT-Notes/stargazers)  
 [![Issues](https://img.shields.io/github/issues/Herb0002/ChatGPT-Notes?style=for-the-badge&color=blue)](https://github.com/Herb0002/ChatGPT-Notes/issues)  
 [![License](https://img.shields.io/github/license/Herb0002/ChatGPT-Notes?style=for-the-badge&color=red)](./LICENSE)  
