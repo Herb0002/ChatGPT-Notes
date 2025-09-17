@@ -3,7 +3,9 @@
   "name": "ChatGPT Note Helper",
   "version": "1.0.0",
   "description": "Adds a \"Set Note\" button to ChatGPT for collecting content in a note overview.",
-  "permissions": ["storage"],
+  "permissions": [
+    "storage"
+  ],
   "content_scripts": [
     {
       "matches": [
@@ -15,11 +17,14 @@
         "scripts/cgpt-tags.js",
         "scripts/cgpt-storage.js",
         "scripts/cgpt-panel.js",
+        "scripts/cgpt-drag.js",
         "scripts/cgpt-copy.js",
         "scripts/cgpt-bootstrap.js",
         "content.js"
       ],
-      "css": ["styles.css"],
+      "css": [
+        "styles.css"
+      ],
       "run_at": "document_idle"
     }
   ]
