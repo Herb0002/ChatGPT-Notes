@@ -18,6 +18,7 @@
         "scripts/cgpt-storage.js",
         "scripts/cgpt-panel.js",
         "scripts/cgpt-drag.js",
+        "scripts/cgpt-dnd.js",
         "scripts/cgpt-copy.js",
         "scripts/cgpt-bootstrap.js",
         "content.js"
