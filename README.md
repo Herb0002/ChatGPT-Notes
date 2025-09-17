@@ -11,6 +11,8 @@ A simple but handy browser extension for ChatGPT that lets you **take notes dire
 Notes can optionally be linked to specific chats, so you can keep track of your thoughts, TODOs, or ideas right where they came up.  
 
 ⚠️ **Important:** For the note content to be recognized correctly, it must be inside a **code block** (also called *raw paste*).  
+<img width="833" height="111" alt="image" src="https://github.com/user-attachments/assets/111eca96-7334-4dc1-a1a9-7cd9be53d218" />
+
 
 ---
 
