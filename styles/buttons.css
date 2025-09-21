@@ -1,0 +1,78 @@
+.cgpt-note-composer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cgpt-note-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 162, 255, 0.35);
+  background: rgba(120, 162, 255, 0.18);
+  color: #f5f5f5;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.cgpt-note-btn.primary {
+  align-self: flex-start;
+  border-color: rgba(120, 162, 255, 0.65);
+  background: rgba(120, 162, 255, 0.32);
+}
+
+.cgpt-note-btn.ghost {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: transparent;
+}
+
+.cgpt-note-btn.small {
+  padding: 5px 10px;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.cgpt-note-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.cgpt-note-btn:hover:not(:disabled),
+.cgpt-note-btn:focus-visible:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(152, 181, 255, 0.8);
+  background: rgba(152, 181, 255, 0.32);
+  outline: none;
+}
+
+.cgpt-set-note-btn {
+  margin-left: 8px;
+  padding: 6px 11px;
+  border-radius: 8px;
+  border: 1px solid rgba(120, 162, 255, 0.45);
+  background: rgba(120, 162, 255, 0.15);
+  color: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.cgpt-set-note-btn:hover,
+.cgpt-set-note-btn:focus-visible {
+  outline: none;
+  border-color: rgba(152, 181, 255, 0.75);
+  background: rgba(152, 181, 255, 0.32);
+  transform: translateY(-1px);
+}
+
+.cgpt-set-note-btn:active {
+  transform: translateY(0);
+}

@@ -1,0 +1,43 @@
+.cgpt-note-composer {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.cgpt-note-composer[data-open="true"] {
+  display: flex;
+}
+
+.cgpt-note-composer textarea,
+.cgpt-note-edit-input {
+  width: 100%;
+  min-height: 96px;
+  max-height: 220px;
+  resize: vertical;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 162, 255, 0.25);
+  background: rgba(18, 19, 21, 0.82);
+  color: inherit;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cgpt-note-composer textarea:focus,
+.cgpt-note-edit-input:focus {
+  outline: none;
+  border-color: rgba(120, 162, 255, 0.65);
+  box-shadow: 0 0 0 2px rgba(120, 162, 255, 0.25);
+}
+
+.cgpt-note-edit-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

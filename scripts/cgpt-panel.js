@@ -5,6 +5,51 @@
   }
   const { STATE } = helper;
 
+  // interner UI-Filterzustand, runtime-only
+  if (typeof STATE.activeFilterTag !== 'string') {
+    STATE.activeFilterTag = '';
+  }
+
+  // ───────────────────────────────────────────────────────────
+  // Inline Undo (10s) – erscheint genau dort, wo man "Delete" klickt
+  // ───────────────────────────────────────────────────────────
+  function createInlineUndoPlaceholder(message = 'Note deleted') {
+    const ph = document.createElement('article');
+    ph.className = 'cgpt-note-item cgpt-note-undo-inline';
+    // Minimal Inline-Styles, damit keine zusätzlichen CSS-Änderungen nötig sind
+    ph.style.border = '1px dashed rgba(0,0,0,0.2)';
+    ph.style.borderRadius = '8px';
+    ph.style.padding = '10px 12px';
+    ph.style.display = 'flex';
+    ph.style.justifyContent = 'space-between';
+    ph.style.alignItems = 'center';
+    ph.style.gap = '12px';
+    ph.style.background = 'rgba(0,0,0,0.02)';
+
+    const msg = document.createElement('span');
+    msg.textContent = message;
+    msg.style.opacity = '0.9';
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'Undo';
+    btn.className = 'cgpt-note-btn small';
+    btn.style.padding = '6px 10px';
+
+    ph.appendChild(msg);
+    ph.appendChild(btn);
+    return { ph, btn };
+  }
+  // ───────────────────────────────────────────────────────────
+
+  // Auto-Resize für Textareas (öffnet direkt groß & wächst mit)
+  function autoSizeTextarea(el, { min = 220, max = 800 } = {}) {
+    if (!el) return;
+    el.style.height = 'auto';
+    const h = Math.min(Math.max(el.scrollHeight, min), max);
+    el.style.height = h + 'px';
+  }
+
   function formatTimestamp(ts) {
     try {
       const date = new Date(ts);
@@ -56,11 +101,15 @@
           <button type="button" class="cgpt-note-btn ghost" data-action="cancel-composer">Discard</button>
         </div>
       </div>
-      <button type="button" class="cgpt-note-btn primary" data-action="open-composer">+ New Note</button>
+      <div class="cgpt-note-toolbar">
+        <button type="button" class="cgpt-note-btn primary" data-action="open-composer">+ New Note</button>
+        <div class="cgpt-tag-filter" data-role="tag-filter"></div>
+      </div>
       <div class="cgpt-note-list" data-role="note-list"></div>
-      <div class="cgpt-note-empty" data-role="empty-state">No notes yet. Use the \"Set Note\" button or start manually.</div>
+      <div class="cgpt-note-empty" data-role="empty-state">No notes yet. Use the "Set Note" button or start manually.</div>
     `;
 
+    // Tag-Editor (Composer)
     const composerTagArea = panel.querySelector('[data-role="composer-tag-area"]');
     if (composerTagArea) {
       const tagEditor = helper.createTagEditor({ context: 'composer', tags: STATE.composerTags });
@@ -88,6 +137,9 @@
         triggerSaveComposer();
       }
     });
+
+    // initial Filterleiste rendern
+    renderTagFilter();
 
     return panel;
   }
@@ -137,7 +189,8 @@
         enterEditMode(noteItem);
         break;
       case 'delete-note':
-        deleteNote(noteItem?.dataset.noteId);
+        // ➜ übergeben wir das Element, damit das Inline-Undo an genau dieser Stelle erscheint
+        deleteNote(noteItem?.dataset.noteId, noteItem);
         break;
       case 'copy-note':
         copyNote(noteItem?.dataset.noteId);
@@ -171,6 +224,26 @@
         if (editor) {
           helper.clearTagEditor(editor);
         }
+        break;
+      }
+      // NEW: Tag-Filter togglen
+      case 'toggle-filter-tag': {
+        const tag = (actionTarget.dataset.tag || '').trim();
+        if (!tag) break;
+        if ((STATE.activeFilterTag || '').toLowerCase() === tag.toLowerCase()) {
+          STATE.activeFilterTag = ''; // ausschalten
+        } else {
+          STATE.activeFilterTag = tag;
+        }
+        // UI aktualisieren
+        renderTagFilter();
+        renderNotes(); // Liste nach Filter neu
+        break;
+      }
+      case 'clear-tag-filter': {
+        STATE.activeFilterTag = '';
+        renderTagFilter();
+        renderNotes();
         break;
       }
       default:
@@ -292,6 +365,67 @@
     }
   }
 
+  // NEW: Tag-Stats berechnen (aus allen Notes); Ausgabe: [{tag, count}]
+  function computeTagStats() {
+    const counts = new Map();
+    (STATE.notes || []).forEach(n => {
+      const tags = helper.sanitizeTags(n.tags || []);
+      tags.forEach(t => {
+        const key = t.toLowerCase();
+        counts.set(key, (counts.get(key) || 0) + 1);
+      });
+    });
+    const entries = [...counts.entries()].map(([lower, count]) => {
+      return { tag: lower, label: helper.formatTagLabel(lower), count };
+    });
+    // Sort: häufigste zuerst, dann alphabetisch
+    entries.sort((a, b) => (b.count - a.count) || a.tag.localeCompare(b.tag));
+    return entries;
+  }
+
+  // NEW: Filterleiste rendern
+  function renderTagFilter() {
+    const panel = ensurePanel();
+    const bar = panel.querySelector('[data-role="tag-filter"]');
+    if (!bar) return;
+
+    const stats = computeTagStats();
+    bar.innerHTML = '';
+
+    if (stats.length === 0) {
+      bar.style.display = 'none';
+      return;
+    }
+    bar.style.display = 'flex';
+    bar.style.flexWrap = 'wrap';
+    bar.style.gap = '6px';
+    bar.style.alignItems = 'center';
+    bar.style.marginLeft = '8px';
+
+    // Optionaler "All"-Button (sichtbar, wenn Filter aktiv)
+    if (STATE.activeFilterTag) {
+      const allBtn = document.createElement('button');
+      allBtn.type = 'button';
+      allBtn.className = 'cgpt-tag-preset';
+      allBtn.dataset.action = 'clear-tag-filter';
+      allBtn.textContent = 'All';
+      bar.appendChild(allBtn);
+    }
+
+    stats.forEach(({ tag, label, count }) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'cgpt-tag-preset';
+      btn.dataset.action = 'toggle-filter-tag';
+      btn.dataset.tag = tag;
+      if ((STATE.activeFilterTag || '').toLowerCase() === tag.toLowerCase()) {
+        btn.setAttribute('data-active', 'true');
+      }
+      btn.textContent = `${label} (${count})`;
+      bar.appendChild(btn);
+    });
+  }
+
   function renderNotes(highlightId) {
     const panel = ensurePanel();
     const list = panel.querySelector('[data-role="note-list"]');
@@ -300,16 +434,28 @@
 
     list.innerHTML = '';
 
-    if (!STATE.notes.length) {
+    // Filter anwenden (case-insensitive)
+    const active = (STATE.activeFilterTag || '').toLowerCase();
+    const source = active
+      ? (STATE.notes || []).filter(n => (n.tags || []).some(t => String(t).toLowerCase() === active))
+      : (STATE.notes || []);
+
+    // Counter + Filter-Bar aktualisieren
+    const total = (STATE.notes || []).length;
+    const shown = source.length;
+    if (!total) {
       empty.style.display = 'block';
       counter.textContent = '';
+      renderTagFilter();
       return;
     }
 
     empty.style.display = 'none';
-    counter.textContent = STATE.notes.length === 1 ? '1 Note' : `${STATE.notes.length} Notes`;
+    counter.textContent = active
+      ? (shown === 1 ? '1 Note (filtered)' : `${shown} Notes (filtered)`)
+      : (total === 1 ? '1 Note' : `${total} Notes`);
 
-    STATE.notes.forEach((note) => {
+    source.forEach((note) => {
       const item = document.createElement('article');
       item.className = 'cgpt-note-item';
       item.dataset.noteId = note.id;
@@ -345,6 +491,9 @@
     });
 
     list.scrollTop = 0;
+
+    // Filterbar nach jeder Änderung aktualisieren (Counts können sich ändern)
+    renderTagFilter();
   }
 
   function addNote(content, options = {}) {
@@ -381,7 +530,7 @@
     return panel;
   }
 
-  function deleteNote(id) {
+  function deleteNote(id, anchorEl) {
     if (!id) {
       return;
     }
@@ -389,9 +538,51 @@
     if (index === -1) {
       return;
     }
-    STATE.notes.splice(index, 1);
-    renderNotes();
+
+    // entferne aus STATE
+    const [removed] = STATE.notes.splice(index, 1);
     helper.persistSettings();
+
+    // Inline-Placeholder an exakt dieser Stelle anzeigen
+    const { ph, btn } = createInlineUndoPlaceholder('Note deleted');
+    let autoTimer = null;
+
+    // Ersetze das DOM-Element inline durch den Undo-Placeholder, ohne alles neu zu rendern
+    if (anchorEl && anchorEl.parentElement) {
+      anchorEl.replaceWith(ph);
+    } else {
+      // Fallback: wenn Element nicht existiert, einfach neu rendern und abbrechen
+      renderNotes();
+      return;
+    }
+
+    const cleanup = () => {
+      if (ph && ph.parentElement) {
+        ph.parentElement.removeChild(ph);
+      }
+      if (autoTimer) {
+        clearTimeout(autoTimer);
+        autoTimer = null;
+      }
+      // Nach Löschung Filter/Counts aktualisieren
+      renderTagFilter();
+    };
+
+    // Undo klick
+    btn.addEventListener('click', () => {
+      cleanup();
+      // wieder einfügen an der alten Position (bounds safe)
+      const insertAt = Math.max(0, Math.min(index, STATE.notes.length));
+      STATE.notes.splice(insertAt, 0, removed);
+      helper.persistSettings();
+      renderNotes(removed.id);
+    });
+
+    // Auto-Expire nach 10s
+    autoTimer = setTimeout(() => {
+      cleanup();
+      // Liste ist bereits ohne Note (STATE mutiert)
+    }, 10000);
   }
 
   function copyNote(id) {
@@ -467,7 +658,14 @@
     const textarea = document.createElement('textarea');
     textarea.className = 'cgpt-note-edit-input';
     textarea.value = original;
+
+    // direkt groß öffnen & mitwachsen lassen
+    textarea.style.maxHeight = 'none';
+    textarea.style.height = 'auto';
     editArea.appendChild(textarea);
+    autoSizeTextarea(textarea, { min: 220, max: 800 });
+    textarea.addEventListener('input', () => autoSizeTextarea(textarea, { min: 220, max: 800 }));
+
     const tagEditor = helper.createTagEditor({ context: 'note', noteId: id, tags: note.tags });
     editArea.appendChild(tagEditor);
     textEl.replaceWith(editArea);
@@ -479,6 +677,7 @@
     const cancel = createButton('Cancel', 'cancel-note-edit', 'small ghost');
     actions.appendChild(save);
     actions.appendChild(cancel);
+
     textarea.focus();
     textarea.setSelectionRange(textarea.value.length, textarea.value.length);
   }
@@ -494,7 +693,7 @@
     }
     const value = textarea.value.trim();
     if (!value) {
-      deleteNote(id);
+      deleteNote(id, item); // beim Leeren gleiches Inline-Undo
       return;
     }
 

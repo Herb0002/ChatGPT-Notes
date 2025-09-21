@@ -1,0 +1,237 @@
+.cgpt-tag-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 162, 255, 0.18);
+  background: rgba(18, 19, 23, 0.45);
+}
+
+.cgpt-tag-editor-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(245, 245, 245, 0.78);
+}
+
+.cgpt-tag-editor-title {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cgpt-tag-editor-reset {
+  border: none;
+  background: transparent;
+  color: rgba(245, 245, 245, 0.6);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.cgpt-tag-editor-reset:hover,
+.cgpt-tag-editor-reset:focus-visible {
+  color: #b7caff;
+  background: rgba(120, 162, 255, 0.18);
+  outline: none;
+}
+
+.cgpt-tag-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 22px;
+}
+
+.cgpt-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  --cgpt-tag-bg: rgba(120, 162, 255, 0.2);
+  --cgpt-tag-border: rgba(120, 162, 255, 0.32);
+  --cgpt-tag-color: #f5f5f5;
+  border: 1px solid var(--cgpt-tag-border);
+  background: var(--cgpt-tag-bg);
+  color: var(--cgpt-tag-color);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+
+.cgpt-tag-chip-remove {
+  border: none;
+  background: transparent;
+  color: rgba(245, 245, 245, 0.82);
+  font-size: 12px;
+  padding: 0 2px;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.cgpt-tag-chip-remove:hover,
+.cgpt-tag-chip-remove:focus-visible {
+  color: #ffb2c1;
+  transform: scale(1.1);
+  outline: none;
+}
+
+.cgpt-tag-preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cgpt-tag-preset {
+  padding: 4px 10px;
+  border-radius: 999px;
+  --cgpt-tag-bg: rgba(120, 162, 255, 0.2);
+  --cgpt-tag-bg-hover: rgba(120, 162, 255, 0.2);
+  --cgpt-tag-bg-active: rgba(120, 162, 255, 0.38);
+  --cgpt-tag-border: rgba(120, 162, 255, 0.24);
+  --cgpt-tag-border-hover: rgba(152, 181, 255, 0.65);
+  --cgpt-tag-border-active: rgba(120, 162, 255, 0.75);
+  --cgpt-tag-color: rgba(245, 245, 245, 0.75);
+  --cgpt-tag-color-hover: #ffffff;
+  --cgpt-tag-color-active: #ffffff;
+  border: 1px solid var(--cgpt-tag-border);
+  background: transparent;
+  color: var(--cgpt-tag-color);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.cgpt-tag-preset:hover,
+.cgpt-tag-preset:focus-visible {
+  border-color: var(--cgpt-tag-border-hover, var(--cgpt-tag-border));
+  background: var(--cgpt-tag-bg-hover, var(--cgpt-tag-bg));
+  color: var(--cgpt-tag-color-hover, var(--cgpt-tag-color));
+  outline: none;
+}
+
+.cgpt-tag-preset[data-active="true"] {
+  background: var(--cgpt-tag-bg-active, var(--cgpt-tag-bg-hover, var(--cgpt-tag-bg)));
+  border-color: var(--cgpt-tag-border-active, var(--cgpt-tag-border-hover, var(--cgpt-tag-border)));
+  color: var(--cgpt-tag-color-active, var(--cgpt-tag-color-hover, var(--cgpt-tag-color)));
+}
+
+/* Tags in Notizanzeige */
+.cgpt-note-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.cgpt-note-tags[hidden] {
+  display: none !important;
+}
+
+.cgpt-note-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  --cgpt-tag-bg: rgba(120, 162, 255, 0.18);
+  --cgpt-tag-border: rgba(120, 162, 255, 0.32);
+  --cgpt-tag-color: rgba(245, 245, 245, 0.9);
+  border: 1px solid var(--cgpt-tag-border);
+  background: var(--cgpt-tag-bg);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--cgpt-tag-color);
+  text-transform: uppercase;
+}
+
+/* Farbliche Presets (Dark) */
+.cgpt-tag-chip[data-tag="todo" i],
+.cgpt-note-tag[data-tag="todo" i],
+.cgpt-tag-preset[data-tag="todo" i] {
+  --cgpt-tag-bg: rgba(59, 130, 246, 0.25);
+  --cgpt-tag-bg-hover: rgba(59, 130, 246, 0.35);
+  --cgpt-tag-bg-active: rgba(37, 99, 235, 0.45);
+  --cgpt-tag-border: rgba(59, 130, 246, 0.55);
+  --cgpt-tag-border-hover: rgba(96, 165, 250, 0.75);
+  --cgpt-tag-border-active: rgba(37, 99, 235, 0.9);
+  --cgpt-tag-color: #e1edff;
+  --cgpt-tag-color-hover: #f4f9ff;
+  --cgpt-tag-color-active: #f4f9ff;
+}
+
+.cgpt-tag-chip[data-tag="problem" i],
+.cgpt-note-tag[data-tag="problem" i],
+.cgpt-tag-preset[data-tag="problem" i] {
+  --cgpt-tag-bg: rgba(249, 115, 22, 0.25);
+  --cgpt-tag-bg-hover: rgba(249, 115, 22, 0.35);
+  --cgpt-tag-bg-active: rgba(234, 88, 12, 0.45);
+  --cgpt-tag-border: rgba(249, 115, 22, 0.55);
+  --cgpt-tag-border-hover: rgba(251, 146, 60, 0.75);
+  --cgpt-tag-border-active: rgba(249, 115, 22, 0.9);
+  --cgpt-tag-color: #ffedd5;
+  --cgpt-tag-color-hover: #fff7ed;
+  --cgpt-tag-color-active: #fff7ed;
+}
+
+.cgpt-tag-chip[data-tag="bug" i],
+.cgpt-note-tag[data-tag="bug" i],
+.cgpt-tag-preset[data-tag="bug" i] {
+  --cgpt-tag-bg: rgba(239, 68, 68, 0.24);
+  --cgpt-tag-bg-hover: rgba(239, 68, 68, 0.34);
+  --cgpt-tag-bg-active: rgba(220, 38, 38, 0.44);
+  --cgpt-tag-border: rgba(239, 68, 68, 0.6);
+  --cgpt-tag-border-hover: rgba(248, 113, 113, 0.78);
+  --cgpt-tag-border-active: rgba(220, 38, 38, 0.88);
+  --cgpt-tag-color: #ffe4e6;
+  --cgpt-tag-color-hover: #fff1f2;
+  --cgpt-tag-color-active: #fff1f2;
+}
+
+.cgpt-tag-chip[data-tag="info" i],
+.cgpt-note-tag[data-tag="info" i],
+.cgpt-tag-preset[data-tag="info" i] {
+  --cgpt-tag-bg: rgba(14, 165, 233, 0.26);
+  --cgpt-tag-bg-hover: rgba(14, 165, 233, 0.36);
+  --cgpt-tag-bg-active: rgba(2, 132, 199, 0.48);
+  --cgpt-tag-border: rgba(14, 165, 233, 0.55);
+  --cgpt-tag-border-hover: rgba(56, 189, 248, 0.75);
+  --cgpt-tag-border-active: rgba(2, 132, 199, 0.9);
+  --cgpt-tag-color: #cffafe;
+  --cgpt-tag-color-hover: #ecfeff;
+  --cgpt-tag-color-active: #ecfeff;
+}
+
+.cgpt-tag-chip[data-tag="idea" i],
+.cgpt-note-tag[data-tag="idea" i],
+.cgpt-tag-preset[data-tag="idea" i] {
+  --cgpt-tag-bg: rgba(168, 85, 247, 0.25);
+  --cgpt-tag-bg-hover: rgba(168, 85, 247, 0.35);
+  --cgpt-tag-bg-active: rgba(147, 51, 234, 0.48);
+  --cgpt-tag-border: rgba(168, 85, 247, 0.58);
+  --cgpt-tag-border-hover: rgba(196, 134, 255, 0.78);
+  --cgpt-tag-border-active: rgba(147, 51, 234, 0.9);
+  --cgpt-tag-color: #f3e8ff;
+  --cgpt-tag-color-hover: #faf5ff;
+  --cgpt-tag-color-active: #faf5ff;
+}
+
+.cgpt-tag-chip[data-tag="question" i],
+.cgpt-note-tag[data-tag="question" i],
+.cgpt-tag-preset[data-tag="question" i] {
+  --cgpt-tag-bg: rgba(34, 197, 94, 0.24);
+  --cgpt-tag-bg-hover: rgba(34, 197, 94, 0.34);
+  --cgpt-tag-bg-active: rgba(22, 163, 74, 0.46);
+  --cgpt-tag-border: rgba(34, 197, 94, 0.55);
+  --cgpt-tag-border-hover: rgba(74, 222, 128, 0.78);
+  --cgpt-tag-border-active: rgba(22, 163, 74, 0.9);
+  --cgpt-tag-color: #dcfce7;
+  --cgpt-tag-color-hover: #ecfdf5;
+  --cgpt-tag-color-active: #ecfdf5;
+}

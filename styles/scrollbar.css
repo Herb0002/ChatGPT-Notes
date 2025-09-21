@@ -1,0 +1,8 @@
+.cgpt-note-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cgpt-note-list::-webkit-scrollbar-thumb {
+  background: rgba(120, 162, 255, 0.3);
+  border-radius: 8px;
+}

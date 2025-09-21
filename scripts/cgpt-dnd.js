@@ -25,6 +25,11 @@
   }
   function getId(el) { return el.dataset.noteId || el.dataset.id || el.getAttribute('data-id') || el.id || ''; }
 
+  function isEditingAnywhere(list) {
+    // irgendein Item im Edit-Modus?
+    return !!(list && list.querySelector('[data-note-editing="true"]'));
+  }
+
   function snapshotRects(list) {
     _rects.clear();
     for (const el of itemsOf(list)) {
@@ -72,24 +77,49 @@
     list.addEventListener('drop', onDrop);
     list.addEventListener('dragenter', (e) => e.preventDefault());
     list.addEventListener('dragleave', () => stopAutoScroll());
+
+    // Rebind bei Änderungen (neue Items ODER Edit-Flag-Änderung)
     const mo = new MutationObserver(() => bindItems(list));
-    mo.observe(list, { childList: true, subtree: true });
+    mo.observe(list, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-note-editing'] });
     list._dndObserver = mo;
+
     bindItems(list);
   }
 
+  function setItemDraggable(el, enabled) {
+    el.setAttribute('draggable', enabled ? 'true' : 'false');
+    el.style.cursor = enabled ? (el.style.cursor || 'grab') : 'default';
+  }
+
   function bindItems(list) {
+    const editing = isEditingAnywhere(list);
     itemsOf(list).forEach((el) => {
-      if (el.hasAttribute('draggable')) return;
-      el.setAttribute('draggable', 'true');
-      el.addEventListener('dragstart', onDragStart);
-      el.addEventListener('dragend', onDragEnd);
-      el.style.cursor = el.style.cursor || 'grab';
+      const thisEditing = el.getAttribute('data-note-editing') === 'true';
+      const canDrag = !editing && !thisEditing;
+
+      // Erstauswertung: Listener einmalig anhängen
+      if (!el._cgptDndBound) {
+        el.addEventListener('dragstart', onDragStart);
+        el.addEventListener('dragend', onDragEnd);
+        el._cgptDndBound = true;
+      }
+
+      setItemDraggable(el, canDrag);
     });
   }
 
   function onDragStart(e) {
     const el = e.currentTarget;
+    const list = el.closest(LIST_SELECTORS.join(',')) || el.parentElement;
+
+    // Blockieren, wenn irgendeine Note editiert wird ODER dieses Element editiert wird
+    if ((list && isEditingAnywhere(list)) || el.getAttribute('data-note-editing') === 'true') {
+      e.stopImmediatePropagation();
+      e.stopPropagation();
+      if (e.cancelable) e.preventDefault();
+      return;
+    }
+
     el.classList.add(DRAG_CLASS);
     el.style.cursor = 'grabbing';
     try {
@@ -99,7 +129,6 @@
       e.dataTransfer.setDragImage(img, 0, 0);
     } catch (_) {}
     // Snapshot before any movement
-    const list = el.closest(findList(document) ? LIST_SELECTORS.join(',') : '*') || el.parentElement;
     if (list) snapshotRects(list);
   }
 
@@ -107,7 +136,7 @@
     const el = e.currentTarget;
     el.classList.remove(DRAG_CLASS);
     el.style.cursor = 'grab';
-    const list = el.closest(findList(document) ? LIST_SELECTORS.join(',') : '*') || el.parentElement;
+    const list = el.closest(LIST_SELECTORS.join(',')) || el.parentElement;
     stopAutoScroll();
     if (!list) return;
     persistOrder(list);
@@ -121,13 +150,23 @@
   }
 
   function onDragOver(e) {
+    const list = e.currentTarget;
+
+    // Während des Editierens keinerlei Reorder/Autoscroll
+    if (isEditingAnywhere(list)) {
+      stopAutoScroll();
+      e.stopImmediatePropagation();
+      e.stopPropagation();
+      if (e.cancelable) e.preventDefault();
+      return;
+    }
+
     e.preventDefault();
     try { e.dataTransfer.dropEffect = 'move'; } catch (_) {}
-    const list = e.currentTarget;
     const dragging = list.querySelector('.' + DRAG_CLASS);
     if (!dragging) return;
 
-    // Autoscroll when near edges
+    // Autoscroll when near edges (nutze Panel als Scroll-Container)
     autoScroll(list, e.clientY);
 
     // FLIP: snapshot before DOM change
@@ -174,7 +213,9 @@
   // Auto-scroll the notes container if mouse is near top/bottom
   function autoScroll(container, clientY) {
     if (!container) return;
-    const rect = container.getBoundingClientRect();
+    // Panel als Scroll-Container verwenden
+    const scrollEl = container.closest('.cgpt-note-panel') || container;
+    const rect = scrollEl.getBoundingClientRect();
     const threshold = 32;
     const maxSpeed = 18; // px per frame
 
@@ -186,7 +227,7 @@
     if (_autoScrollRAF) return;
 
     const step = () => {
-      container.scrollTop += dir * maxSpeed;
+      scrollEl.scrollTop += dir * maxSpeed;
       _autoScrollRAF = requestAnimationFrame(step);
     };
     _autoScrollRAF = requestAnimationFrame(step);
@@ -201,13 +242,13 @@
     const style = document.createElement('style');
     style.id = 'cgpt-dnd-anim-style';
     style.textContent = `
+      /* Liste: eine schlichte vertikale Spalte; Scrollen macht das Panel */
       .cgpt-note-list, .cgpt-notes-list, .cgpt-notes {
-        display: grid !important;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        grid-auto-rows: minmax(40px, auto);
+        display: flex !important;
+        flex-direction: column;
         gap: 12px;
-        align-content: start;
-        overflow: auto;
+        align-content: stretch;
+        overflow: visible !important;
       }
       .cgpt-note-item, .cgpt-note {
         transition: box-shadow 120ms ${EASE}, transform ${ANIM_MS}ms ${EASE};
@@ -217,6 +258,8 @@
         opacity: 0.95;
         box-shadow: 0 6px 24px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.15);
       }
+      /* während Editieren: Cursor normal, kein Draggable-Feeling */
+      .cgpt-note-item[data-note-editing="true"] { cursor: default !important; }
     `;
     document.head.appendChild(style);
   }

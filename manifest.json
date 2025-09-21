@@ -24,7 +24,15 @@
         "content.js"
       ],
       "css": [
-        "styles.css"
+        "styles/base.css",
+        "styles/panel.css",
+        "styles/buttons.css",
+        "styles/composer.css",
+        "styles/tags.css",
+        "styles/notes.css",
+        "styles/scrollbar.css",
+        "styles/animations.css",
+        "styles/light-theme.css"
       ],
       "run_at": "document_idle"
     }

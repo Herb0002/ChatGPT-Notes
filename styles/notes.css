@@ -1,0 +1,106 @@
+.cgpt-note-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 12px;
+  /* wichtig: Liste clippt nicht, Panel übernimmt Scrollen */
+  overflow: visible;
+  padding-right: 4px;
+  scrollbar-width: thin; /* optional, hat keinen Effekt ohne eigenes Scrolling */
+}
+
+.cgpt-note-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.25);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cgpt-note-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.cgpt-note-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cgpt-note-chat-link {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(120, 162, 255, 0.75);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.cgpt-note-chat-link:hover,
+.cgpt-note-chat-link:focus-visible {
+  color: rgba(145, 186, 255, 0.95);
+  text-decoration: underline;
+  outline: none;
+}
+
+.cgpt-note-chat-link[hidden] {
+  display: none !important;
+}
+
+.cgpt-note-item-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.cgpt-note-item-actions[data-edit-mode="true"] {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cgpt-note-time {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(245, 245, 245, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.cgpt-note-text {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+  background: transparent;
+  color: inherit;
+}
+
+.cgpt-note-highlight {
+  border-color: rgba(120, 162, 255, 0.75);
+  box-shadow: 0 0 0 2px rgba(120, 162, 255, 0.35);
+}
+
+.cgpt-note-empty {
+  display: none;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.14);
+  font-size: 12px;
+  color: rgba(245, 245, 245, 0.7);
+  text-align: center;
+}
+
+/* Edit-Textfeld: groß öffnen und nicht künstlich begrenzen */
+.cgpt-note-edit-input {
+  min-height: 220px;   /* Startgröße beim Öffnen */
+  height: auto;        /* wird im JS dynamisch gesetzt */
+  max-height: none;    /* keine harte Obergrenze, Panel scrollt ja */
+  resize: vertical;    /* optional: manuell vergrößerbar per Griff */
+}

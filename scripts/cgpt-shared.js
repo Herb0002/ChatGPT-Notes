@@ -18,7 +18,6 @@
   ].join(', ');
   helper.PRESET_TAGS = [
     { id: 'todo', label: 'TODO' },
-    { id: 'problem', label: 'Problem' },
     { id: 'bug', label: 'Bug' },
     { id: 'info', label: 'Info' },
     { id: 'idea', label: 'Idea' },
