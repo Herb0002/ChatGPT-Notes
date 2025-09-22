@@ -10,7 +10,7 @@ Notes can optionally be linked to specific chats, so you can keep track of your 
 ## Features  
 - 📝 **Work Notes Panel**: Extra panel inside ChatGPT to capture notes.  
 - 🔗 **Chat Linking**: Attach notes to a specific chat for better context.  
-- 🏷️ **Tags**: Categorize your notes with tags like `TODO`, `Problem`, `Bug`, `Info`, `Idea`, `Question`.  
+- 🏷️ **Tags**: Categorize your notes with tags like `TODO`, `Bug`, `Info`, `Idea`, `Question`.  
 - 💾 **Persistent Storage**: Notes are stored locally and survive page reloads.  
 - 🔓 **Open Source**: Free to use, extend, and customize.  
 
